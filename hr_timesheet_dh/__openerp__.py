@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "hr_timesheet_overtime",
+    'name': "hr_timesheet_dh",
 
     'summary': """
         Short (1 phrase/line) summary of the module's purpose, used as
