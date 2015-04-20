@@ -47,12 +47,15 @@ class hr_timesheet_dh(osv.osv):
         contract_obj = self.pool.get('hr.contract')
         calendar_obj = self.pool.get('resource.calendar')
         duty_hours = 0.0
-        contract_ids = contract_obj.search(cr, uid, [('employee_id','=',employee.id)], context=context)
+        contract_ids = contract_obj.search(cr, uid, [('employee_id','=',employee.id),
+                                                     ('date_start','<=', date_from), '|',
+                                                     ('date_end', '>=', date_from), ('date_end', '=', None) ], context=context)
         for contract in contract_obj.browse(cr, uid, contract_ids, context=context):
-            duty_hours += calendar_obj.get_working_hours_of_date(cr=cr, uid=uid,
+            dh = calendar_obj.get_working_hours_of_date(cr=cr, uid=uid,
                                                          id=contract.working_hours.id,
                                                          start_dt=date_from,
                                                          context=context)
+            duty_hours += dh
         return duty_hours
 
 class hr_timesheet_day_dh(osv.osv):
