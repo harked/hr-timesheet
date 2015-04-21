@@ -1,5 +1,11 @@
 <openerp>
     <data>
+         <template id="assets_backend" name="petstore_assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/hr_timesheet_dh/static/src/js/timesheet_dh.js"/>
+            </xpath>
+        </template>
+
         <record id="action_hr_timesheet_overtime" model="ir.actions.act_window">
             <field name="name">Academy teachers</field>
             <field name="res_model">hr_timesheet_sheet.sheet</field>
@@ -50,7 +56,13 @@
                   parent="menu_academy_content"
                   action="action_hr_timesheet_day_dh"/>
 
-        <menuitem name="My Current Timesheet11111" id="menu_act_hr_timesheet_sheet_form_my_current" parent="hr_attendance.menu_hr_time_tracking" action="print_instance" sequence="1"/>
+
+        <record id="action_home_page" model="ir.actions.client">
+            <field name="name">Pet Store Home</field>
+        </record>
+
+        <menuitem id="home_page_petstore_menu" name="Home Page" parent="menu_academy_content"
+            action="action_home_page"/>
 
     </data>
 </openerp>

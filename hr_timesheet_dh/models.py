@@ -26,9 +26,14 @@ class hr_timesheet_dh(osv.osv):
     }
 
     def create(self, cr, uid, vals, context=None):
+        print 'create'
         res = super(hr_timesheet_dh, self).create(cr, uid, vals, context=context)
         self.create_days_dh(cr, uid, [res], context)
         return res
+
+    def write(self, cr, uid, ids, vals, context=None):
+        print 'write'
+        return super(hr_timesheet_dh, self).write(cr, uid, ids, vals, context)
 
     def create_days_dh(self, cr, uid, ids, context=None):
         for sheet in self.browse(cr, uid, ids, context=context or {}):
