@@ -34,15 +34,6 @@
             <field name="res_model">hr_timesheet.day.dh</field>
         </record>
 
-        <record model="ir.actions.server" id="print_instance">
-            <field name="name">Res Partner Server Action</field>
-            <field name="model_id" ref="model_hr_timesheet_sheet_sheet"/>
-            <field name="condition">True</field>
-            <field name="type">ir.actions.server</field>
-            <field name="state">code</field>
-            <field name="code">action = pool.get('hr_timesheet_sheet.shet').open_timesheet(cr, uid, None, context)</field>
-        </record>
-
         <menuitem sequence="0" id="menu_academy" name="Academy"/>
         <menuitem id="menu_academy_content" parent="menu_academy"
                   name="Academy Content"/>
@@ -50,7 +41,6 @@
                   parent="menu_academy_content"
                   action="action_hr_timesheet_day_dh"/>
 
-        <menuitem name="My Current Timesheet11111" id="menu_act_hr_timesheet_sheet_form_my_current" parent="hr_attendance.menu_hr_time_tracking" action="print_instance" sequence="1"/>
 
     </data>
 </openerp>

@@ -15,4 +15,5 @@ print uid
 
 models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url), verbose=True)
 print models.execute_kw(db, uid, password,
-                  'hr_timesheet_sheet.sheet', 'attendance_analysis', [], dict(employee_id= 1, month=5, year=2015))
+                  'hr_timesheet_sheet.sheet', 'attendance_analysis', [], dict(employee_id= 1, start_date='2015-04-01',
+                                                                              end_date='2015-04-30'))
