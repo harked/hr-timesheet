@@ -3,6 +3,8 @@ from datetime import datetime
 
 from openerp.osv import fields, osv
 from dateutil import rrule, parser
+import pytz
+
 
 class hr_timesheet_dh(osv.osv):
     """
@@ -23,8 +25,15 @@ class hr_timesheet_dh(osv.osv):
     _columns = {
         'total_duty_hours': fields.function(_duty_hours, method=True, string='Total Duty Hours', multi="_duty_hours"),
         'duty_hour_ids': fields.one2many('hr_timesheet.day.dh', 'sheet_id', 'Daily Duty Hours', readonly=True),
-        'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=-10.0),
+        'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=0.0),
     }
+
+    def get_overtime(self, cr, uid, ids, start_date, context=None):
+        for sheet in self.browse(cr, uid, ids, context):
+            if sheet.state == 'done':
+                return sheet.total_duty_hours
+            return self.calculate_diff(cr, uid, ids, start_date, context)
+
 
     def create(self, cr, uid, vals, context=None):
         res = super(hr_timesheet_dh, self).create(cr, uid, vals, context=context)
@@ -59,12 +68,13 @@ class hr_timesheet_dh(osv.osv):
             duty_hours += dh
         return duty_hours
 
-    def get_previous_month_diff(self, cr, uid, employee_id, prev_timesheet_date_to, context=None):
+    def get_previous_month_diff(self, cr, uid, employee_id, prev_timesheet_date_from, context=None):
         total_diff = 0.0
-        for timesheet in self.search_read(cr, uid, [('employee_id','=',employee_id),
-                                                    ('date_to', '<', prev_timesheet_date_to),
-                                                    ], ['total_diff_hours']):
-            total_diff += timesheet['total_diff_hours']
+        timesheet_ids = self.search(cr, uid, [('employee_id','=',employee_id),
+                                              ('date_from', '<=', prev_timesheet_date_from),
+                                             ])
+        for timesheet in self.browse(cr, uid, timesheet_ids):
+            total_diff += self.get_overtime(cr, uid, [timesheet.id], start_date=prev_timesheet_date_from, context=context)
         return total_diff
 
     def attendance_analysis(self, cr, uid, employee_id, start_date, end_date, context=None):
@@ -78,9 +88,10 @@ class hr_timesheet_dh(osv.osv):
 
         dates = list(rrule.rrule(rrule.DAILY,
                                  dtstart=parser.parse(start_date),
-                                 until=min(parser.parse(end_date), datetime.now())))
+                                 until=min(parser.parse(end_date), datetime.utcnow())))
         total = {'worked_hours': 0.0, 'diff': current_month_diff}
         for date_line in dates:
+
             dh = self.calculate_duty_hours(cr, uid, employee_id, date_line, context)
             worked_hours = 0.0
             for attendance in attendance_obj.search_read(cr, uid, [('employee_id','=', employee_id),
@@ -109,20 +120,22 @@ class hr_timesheet_dh(osv.osv):
 
     def write(self, cr, uid, ids, vals, context=None):
         if 'state' in vals and vals['state'] == 'done':
-            vals['total_diff_hours'] = self.calculate_diff(cr, uid, ids, context)
+            vals['total_diff_hours'] = self.calculate_diff(cr, uid, ids, None, context)
         elif 'state' in vals and vals['state'] == 'draft':
             vals['total_diff_hours'] = 0.0
         res = super(hr_timesheet_dh, self).write(cr, uid, ids, vals, context=context)
         return res
 
-    def calculate_diff(self, cr, uid, ids, context=None):
+    def calculate_diff(self, cr, uid, ids, end_date=None, context=None):
         attendance_obj = self.pool.get('hr.attendance')
+        q = [('action', '=', 'sign_out')]
+        if end_date:
+            q.append(('name', '<=', end_date))
         for sheet in self.browse(cr, uid, ids, context):
+            q.append(('sheet_id', '=', sheet.id))
             worked_hours = 0.0
-            for attendance in attendance_obj.search_read(cr, uid, [('sheet_id', '=', sheet.id),
-                                                                   ('action', '=', 'sign_out'),
-                                                                  ], ['name', 'worked_hours']):
-                worked_hours = attendance['worked_hours']
+            for attendance in attendance_obj.search_read(cr, uid, q, ['name', 'worked_hours']):
+                worked_hours += attendance['worked_hours']
             return worked_hours-sheet.total_duty_hours
 
 class hr_timesheet_day_dh(osv.osv):
