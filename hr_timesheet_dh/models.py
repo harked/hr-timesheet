@@ -99,7 +99,7 @@ class hr_timesheet_dh(osv.osv):
                                                          ('name', '>=', date_line.strftime('%Y-%m-%d 00:00:00')),
                                                          ('name', '<=', date_line.strftime('%Y-%m-%d 23:59:59')),
                                                          ], ['name', 'worked_hours']):
-                worked_hours = attendance['worked_hours']
+                worked_hours += attendance['worked_hours']
 
             diff = worked_hours-dh
             current_month_diff += diff
