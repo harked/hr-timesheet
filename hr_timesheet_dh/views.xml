@@ -34,13 +34,5 @@
             <field name="res_model">hr_timesheet.day.dh</field>
         </record>
 
-        <menuitem sequence="0" id="menu_academy" name="Academy"/>
-        <menuitem id="menu_academy_content" parent="menu_academy"
-                  name="Academy Content"/>
-        <menuitem id="menu_academy_content_teachers"
-                  parent="menu_academy_content"
-                  action="action_hr_timesheet_day_dh"/>
-
-
     </data>
 </openerp>
