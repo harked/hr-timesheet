@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from openerp.osv import fields, osv
 from dateutil import rrule, parser
@@ -22,17 +22,34 @@ class hr_timesheet_dh(osv.osv):
                 res[sheet.id]['total_duty_hours'] += duty_hours.duty_hours
         return res
 
-    _columns = {
-        'total_duty_hours': fields.function(_duty_hours, method=True, string='Total Duty Hours', multi="_duty_hours"),
-        'duty_hour_ids': fields.one2many('hr_timesheet.day.dh', 'sheet_id', 'Daily Duty Hours', readonly=True),
-        'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=0.0),
-    }
-
     def get_overtime(self, cr, uid, ids, start_date, context=None):
         for sheet in self.browse(cr, uid, ids, context):
             if sheet.state == 'done':
                 return sheet.total_duty_hours
             return self.calculate_diff(cr, uid, ids, start_date, context)
+
+    def _overtime_diff(self, cr, uid, ids, name, args, context=None):
+        res = {}
+        for sheet in self.browse(cr, uid, ids, context):
+            old_timesheet_start_from = parser.parse(sheet.date_from)-timedelta(days=1)
+            prev_timesheet_diff = self.get_previous_month_diff(cr, uid, sheet.employee_id.id,
+                                                               old_timesheet_start_from.strftime('%Y-%m-%d'),
+                                                               context=context)
+            res.setdefault(sheet.id, {
+                'calculate_diff_hours': self.get_overtime(cr, uid, ids,
+                                                          datetime.today().strftime('%Y-%m-%d'),
+                                                          context) + prev_timesheet_diff,
+                'prev_timesheet_diff': prev_timesheet_diff,
+            })
+        return res
+
+    _columns = {
+        'total_duty_hours': fields.function(_duty_hours, method=True, string='Total Duty Hours', multi="_duty_hours"),
+        'duty_hour_ids': fields.one2many('hr_timesheet.day.dh', 'sheet_id', 'Daily Duty Hours', readonly=True),
+        'total_diff_hours': fields.float('Total Diff Hours', readonly=True, default=0.0),
+        'calculate_diff_hours': fields.function(_overtime_diff, method=True, string="Diff (worked-duty)", multi="_diff"),
+        'prev_timesheet_diff': fields.function(_overtime_diff, method=True, string="Diff from old", multi="_diff"),
+    }
 
 
     def create(self, cr, uid, vals, context=None):
