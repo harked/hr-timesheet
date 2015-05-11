@@ -29,8 +29,14 @@
             <field name="model">hr_timesheet_sheet.sheet</field>
             <field name="inherit_id" ref="hr_timesheet_sheet.hr_timesheet_sheet_form"/>
             <field name="arch" type="xml">
-                <xpath expr="/form/sheet/group/group[2]/field[@name='total_timesheet']" position="after">
-                    <field name="total_duty_hours" widget="float_time"/>
+                <xpath expr="/form/sheet/group/group[2]" position="replace">
+                    <group>
+                        <field name="prev_timesheet_diff" widget="float_time" string="Diff from old"/>
+                        <field name="total_timesheet" widget="float_time"/>
+                        <field name="total_attendance" widget="float_time" string="Attendence this month"/>
+                        <field name="total_duty_hours" widget="float_time" string="Duty Hours this month"/>
+                        <field name="calculate_diff_hours" widget="float_time" string="Total"/>
+                    </group>
                 </xpath>
             </field>
         </record>
@@ -40,10 +46,5 @@
             <field name="res_model">hr_timesheet.day.dh</field>
         </record>
 
-
-        <menuitem id="main_petstore_menu" name="Pet Store" />
-
-        <menuitem id="petstore_menu" name="Pet Store"
-                  parent="main_petstore_menu" />
     </data>
 </openerp>
