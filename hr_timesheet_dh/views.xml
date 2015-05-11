@@ -40,29 +40,10 @@
             <field name="res_model">hr_timesheet.day.dh</field>
         </record>
 
-        <record model="ir.actions.server" id="print_instance">
-            <field name="name">Res Partner Server Action</field>
-            <field name="model_id" ref="model_hr_timesheet_sheet_sheet"/>
-            <field name="condition">True</field>
-            <field name="type">ir.actions.server</field>
-            <field name="state">code</field>
-            <field name="code">action = pool.get('hr_timesheet_sheet.shet').open_timesheet(cr, uid, None, context)</field>
-        </record>
 
-        <menuitem sequence="0" id="menu_academy" name="Academy"/>
-        <menuitem id="menu_academy_content" parent="menu_academy"
-                  name="Academy Content"/>
-        <menuitem id="menu_academy_content_teachers"
-                  parent="menu_academy_content"
-                  action="action_hr_timesheet_day_dh"/>
+        <menuitem id="main_petstore_menu" name="Pet Store" />
 
-
-        <record id="action_home_page" model="ir.actions.client">
-            <field name="name">Pet Store Home</field>
-        </record>
-
-        <menuitem id="home_page_petstore_menu" name="Home Page" parent="menu_academy_content"
-            action="action_home_page"/>
-
+        <menuitem id="petstore_menu" name="Pet Store"
+                  parent="main_petstore_menu" />
     </data>
 </openerp>

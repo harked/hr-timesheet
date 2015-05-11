@@ -1,0 +1,13 @@
+.oe_products_item {
+    display: inline-block;
+    padding: 3px;
+    margin: 5px;
+    border: 1px solid #000000;
+    border-radius: 3px;
+}
+
+.oe_color_div {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+}

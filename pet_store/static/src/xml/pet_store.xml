@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="HomePage">
+        <div>
+            <div class="oe_color_div"/>
+        </div>
+    </t>
+
+    <t t-name="ProductWidget">
+        <div>
+            <t t-foreach="widget.products" t-as="product">
+                <span class="oe_products_item"
+                      t-attf-style="background-color: {{ widget.color }}">
+                    <t t-esc="product"/>
+                </span>
+                <br/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="ColorInputWidget">
+        <div>
+            Red: <input type="text" class="oe_color_red" value="00"/><br/>
+            Green: <input type="text" class="oe_color_green" value="00"/><br/>
+            Blue: <input type="text" class="oe_color_blue" value="00"/><br/>
+        </div>
+    </t>
+</templates>
